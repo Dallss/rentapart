@@ -14,7 +14,7 @@ class Profile(models.Model):
         RENTER = "renter", "Renter"
 
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="profile")
-    role = models.CharField(max_length=10, choices=Role.choices)
+    role = models.CharField(max_length=10, choices=Role.choices, blank=True, null=True)
     phone = models.CharField(max_length=20, blank=True)
     bio = models.TextField(blank=True)
     avatar = models.ImageField(upload_to="avatars/", blank=True, null=True)
@@ -22,5 +22,9 @@ class Profile(models.Model):
     def is_landlord(self):
         return self.role == self.Role.LANDLORD
 
+    def has_role(self):
+        return bool(self.role)
+
     def __str__(self):
-        return f"{self.user.email} ({self.role})"
+        label = self.role or "no role"
+        return f"{self.user.email} ({label})"
