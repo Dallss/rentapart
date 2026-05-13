@@ -31,7 +31,7 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("accounts/", include("allauth.urls")),
 
-        path("api/schema/", SpectacularAPIView.as_view(), name="schema"),
+    path("api/schema/", SpectacularAPIView.as_view(), name="schema"),
 
     # Swagger UI
     path(
@@ -46,4 +46,6 @@ urlpatterns = [
         SpectacularRedocView.as_view(url_name="schema"),
         name="redoc",
     ),
+
+    path("api/", include("listings.urls")),
 ]

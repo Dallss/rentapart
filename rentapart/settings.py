@@ -32,6 +32,7 @@ ALLOWED_HOSTS = []
 
 REST_FRAMEWORK = {
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+     "DEFAULT_FILTER_BACKENDS": ["django_filters.rest_framework.DjangoFilterBackend"],
 }
 
 SPECTACULAR_SETTINGS = {
@@ -49,12 +50,15 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
 
     'core',
+    'listings',
+
     "django.contrib.sites",
     "allauth",
     "allauth.account",
     "allauth.socialaccount",
     "allauth.socialaccount.providers.google",
     "drf_spectacular",
+    "django_filters",
 ]
 
 MIDDLEWARE = [
