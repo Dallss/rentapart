@@ -1,0 +1,181 @@
+[
+   {
+     "model": "accounts.user",
+     "pk": 1,
+     "fields": {
+       "email": "emma.jansen@gmail.com",
+       "username": "emmajansen",
+       "password": "pbkdf2_sha256$260000$dummy$hashed"
+     }
+   },
+   {
+     "model": "accounts.profile",
+     "pk": 1,
+     "fields": {
+       "user": 1,
+       "phone": "+31 6 12345678",
+       "bio": "UX designer living in Amsterdam, renting out my apartment while traveling."
+     }
+   },
+   {
+     "model": "listings.listing",
+     "pk": 1,
+     "fields": {
+       "landlord": 1,
+       "title": "Bright Canal-Side Studio",
+       "description": "Modern studio with canal view, fully furnished and close to Jordaan.",
+       "address": "Prinsengracht 101",
+       "city": "Amsterdam",
+       "monthly_rent": "1650.00",
+       "bedrooms": 1,
+       "bathrooms": 1,
+       "is_available": true,
+       "created_at": "2026-05-14T10:00:00Z",
+       "updated_at": "2026-05-14T10:00:00Z"
+     }
+   },
+ 
+   {
+     "model": "accounts.user",
+     "pk": 2,
+     "fields": {
+       "email": "noah.devries@gmail.com",
+       "username": "noahdevries",
+       "password": "pbkdf2_sha256$260000$dummy$hashed"
+     }
+   },
+   {
+     "model": "accounts.profile",
+     "pk": 2,
+     "fields": {
+       "user": 2,
+       "phone": "+31 6 23456789",
+       "bio": "Freelance developer working remotely from Amsterdam."
+     }
+   },
+   {
+     "model": "listings.listing",
+     "pk": 2,
+     "fields": {
+       "landlord": 2,
+       "title": "Modern Jordaan Apartment",
+       "description": "Spacious 1-bedroom apartment in the heart of Jordaan.",
+       "address": "Elandsgracht 45",
+       "city": "Amsterdam",
+       "monthly_rent": "1900.00",
+       "bedrooms": 1,
+       "bathrooms": 1,
+       "is_available": true,
+       "created_at": "2026-05-14T10:00:00Z",
+       "updated_at": "2026-05-14T10:00:00Z"
+     }
+   },
+ 
+   {
+     "model": "accounts.user",
+     "pk": 3,
+     "fields": {
+       "email": "lucas.bakker@gmail.com",
+       "username": "lucasbakker",
+       "password": "pbkdf2_sha256$260000$dummy$hashed"
+     }
+   },
+   {
+     "model": "accounts.profile",
+     "pk": 3,
+     "fields": {
+       "user": 3,
+       "phone": "+31 6 34567890",
+       "bio": "Product manager and part-time landlord."
+     }
+   },
+   {
+     "model": "listings.listing",
+     "pk": 3,
+     "fields": {
+       "landlord": 3,
+       "title": "Spacious Canal House Flat",
+       "description": "Two-bedroom apartment with high ceilings and canal view.",
+       "address": "Keizersgracht 220",
+       "city": "Amsterdam",
+       "monthly_rent": "2400.00",
+       "bedrooms": 2,
+       "bathrooms": 1,
+       "is_available": true,
+       "created_at": "2026-05-14T10:00:00Z",
+       "updated_at": "2026-05-14T10:00:00Z"
+     }
+   },
+ 
+   {
+     "model": "accounts.user",
+     "pk": 4,
+     "fields": {
+       "email": "sophie.koster@gmail.com",
+       "username": "sophiekoster",
+       "password": "pbkdf2_sha256$260000$dummy$hashed"
+     }
+   },
+   {
+     "model": "accounts.profile",
+     "pk": 4,
+     "fields": {
+       "user": 4,
+       "phone": "+31 6 45678901",
+       "bio": "Architecture student renting out my extra room."
+     }
+   },
+   {
+     "model": "listings.listing",
+     "pk": 4,
+     "fields": {
+       "landlord": 4,
+       "title": "Cozy Student Loft",
+       "description": "Affordable loft near university area, ideal for students.",
+       "address": "Overtoom 88",
+       "city": "Amsterdam",
+       "monthly_rent": "1300.00",
+       "bedrooms": 1,
+       "bathrooms": 1,
+       "is_available": true,
+       "created_at": "2026-05-14T10:00:00Z",
+       "updated_at": "2026-05-14T10:00:00Z"
+     }
+   },
+ 
+   {
+     "model": "accounts.user",
+     "pk": 5,
+     "fields": {
+       "email": "david.hendriks@gmail.com",
+       "username": "davidhendriks",
+       "password": "pbkdf2_sha256$260000$dummy$hashed"
+     }
+   },
+   {
+     "model": "accounts.profile",
+     "pk": 5,
+     "fields": {
+       "user": 5,
+       "phone": "+31 6 56789012",
+       "bio": "Startup founder splitting time between Amsterdam and Berlin."
+     }
+   },
+   {
+     "model": "listings.listing",
+     "pk": 5,
+     "fields": {
+       "landlord": 5,
+       "title": "Luxury Penthouse with Skyline View",
+       "description": "Top-floor penthouse with rooftop terrace and panoramic city views.",
+       "address": "Zuidas 12",
+       "city": "Amsterdam",
+       "monthly_rent": "4200.00",
+       "bedrooms": 3,
+       "bathrooms": 2,
+       "is_available": true,
+       "created_at": "2026-05-14T10:00:00Z",
+       "updated_at": "2026-05-14T10:00:00Z"
+     }
+   }
+ ]
