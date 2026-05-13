@@ -49,7 +49,6 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
 
-    'core',
     'listings',
     'applications',
     'accounts',
@@ -159,4 +158,4 @@ SOCIALACCOUNT_PROVIDERS = {
     }
 }
 LOGIN_REDIRECT_URL = "/"
-AUTH_USER_MODEL = "core.User"
+AUTH_USER_MODEL = "accounts.User"
