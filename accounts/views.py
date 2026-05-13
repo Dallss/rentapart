@@ -1,5 +1,7 @@
 from django.conf import settings
 from django.contrib.auth import get_user_model
+from django.contrib.auth.models import Permission
+from django.contrib.contenttypes.models import ContentType
 from google.auth.transport import requests as google_requests
 from google.oauth2 import id_token as google_id_token
 from rest_framework import status
@@ -10,7 +12,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.views import TokenRefreshView
 
 from .models import Profile
-from .serializers import GoogleAuthSerializer, SetRoleSerializer
+from .serializers import GoogleAuthSerializer
 
 User = get_user_model()
 
@@ -34,8 +36,17 @@ def _user_payload(user, profile):
     return {
         "email": user.email,
         "username": user.username,
-        "role": profile.role,
+        "capabilities": {
+            "leasing": profile.leasing_capabilities(),
+        },
     }
+
+
+def _manage_leases_permission():
+    return Permission.objects.get(
+        content_type=ContentType.objects.get_for_model(Profile),
+        codename="manage_leases",
+    )
 
 
 class GoogleAuthView(APIView):
@@ -86,37 +97,31 @@ class GoogleAuthView(APIView):
             user.save(update_fields=["password"])
 
         profile = user.profile
-        needs_role = created or not profile.has_role()
 
         refresh = RefreshToken.for_user(user)
         return Response(
             {
                 "access": str(refresh.access_token),
                 "refresh": str(refresh),
-                "needs_role": needs_role,
                 "user": _user_payload(user, profile),
             },
             status=status.HTTP_200_OK,
         )
 
 
-class SetRoleView(APIView):
+class GrantLeaseManagementView(APIView):
+    """
+    Optional upgrade: assign ``accounts.manage_leases`` to the user (idempotent).
+    Same permission can be granted via Django admin or groups.
+    """
+
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
-        profile = request.user.profile
-        if profile.has_role():
-            return Response(
-                {"detail": "Role has already been set and cannot be changed."},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
-        ser = SetRoleSerializer(data=request.data)
-        ser.is_valid(raise_exception=True)
-        profile.role = ser.validated_data["role"]
-        profile.save(update_fields=["role"])
-
-        return Response(_user_payload(request.user, profile), status=status.HTTP_200_OK)
+        perm = _manage_leases_permission()
+        request.user.user_permissions.add(perm)
+        user = User.objects.get(pk=request.user.pk)
+        return Response(_user_payload(user, user.profile), status=status.HTTP_200_OK)
 
 
 class JWTTokenRefreshView(TokenRefreshView):

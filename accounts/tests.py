@@ -6,6 +6,8 @@ from rest_framework import status
 from rest_framework.test import APIClient
 from rest_framework_simplejwt.tokens import RefreshToken
 
+from accounts.models import MANAGE_LEASES_PERMISSION
+
 User = get_user_model()
 
 
@@ -30,9 +32,11 @@ class GoogleAuthViewTests(TestCase):
         self.assertEqual(r.status_code, status.HTTP_200_OK)
         self.assertIn("access", r.data)
         self.assertIn("refresh", r.data)
-        self.assertTrue(r.data["needs_role"])
+        self.assertNotIn("needs_role", r.data)
         self.assertEqual(r.data["user"]["email"], "newuser@example.com")
-        self.assertIsNone(r.data["user"]["role"])
+        caps = r.data["user"]["capabilities"]["leasing"]
+        self.assertTrue(caps["lessee"])
+        self.assertFalse(caps["manage"])
         self.assertTrue(User.objects.filter(email="newuser@example.com").exists())
 
     @override_settings(GOOGLE_CLIENT_ID="test-client.apps.googleusercontent.com")
@@ -43,7 +47,7 @@ class GoogleAuthViewTests(TestCase):
         self.assertEqual(r.status_code, status.HTTP_400_BAD_REQUEST)
 
 
-class SetRoleViewTests(TestCase):
+class GrantLeaseManagementViewTests(TestCase):
     def setUp(self):
         self.client = APIClient()
         self.user = User.objects.create_user(
@@ -51,19 +55,19 @@ class SetRoleViewTests(TestCase):
             username="ruser",
             password="not-used-for-api",
         )
-        self.user.profile.role = None
-        self.user.profile.save(update_fields=["role"])
         access = str(RefreshToken.for_user(self.user).access_token)
         self.client.credentials(HTTP_AUTHORIZATION=f"Bearer {access}")
 
-    def test_set_role_once(self):
-        r = self.client.post("/api/auth/role/", {"role": "landlord"}, format="json")
+    def test_grant_manage_leases(self):
+        self.assertFalse(self.user.has_perm(MANAGE_LEASES_PERMISSION))
+        r = self.client.post("/api/auth/capabilities/leasing/manage/", {}, format="json")
         self.assertEqual(r.status_code, status.HTTP_200_OK)
-        self.assertEqual(r.data["role"], "landlord")
+        self.assertTrue(r.data["capabilities"]["leasing"]["manage"])
+        u = User.objects.get(pk=self.user.pk)
+        self.assertTrue(u.has_perm(MANAGE_LEASES_PERMISSION))
 
-        r2 = self.client.post("/api/auth/role/", {"role": "renter"}, format="json")
-        self.assertEqual(r2.status_code, status.HTTP_400_BAD_REQUEST)
-
-    def test_invalid_role_rejected(self):
-        r = self.client.post("/api/auth/role/", {"role": "admin"}, format="json")
-        self.assertEqual(r.status_code, status.HTTP_400_BAD_REQUEST)
+    def test_grant_manage_leases_idempotent(self):
+        self.client.post("/api/auth/capabilities/leasing/manage/", {}, format="json")
+        r2 = self.client.post("/api/auth/capabilities/leasing/manage/", {}, format="json")
+        self.assertEqual(r2.status_code, status.HTTP_200_OK)
+        self.assertTrue(r2.data["capabilities"]["leasing"]["manage"])

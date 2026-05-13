@@ -1,9 +1,13 @@
 from django.urls import path
 
-from .views import GoogleAuthView, JWTTokenRefreshView, SetRoleView
+from .views import GoogleAuthView, GrantLeaseManagementView, JWTTokenRefreshView
 
 urlpatterns = [
     path("google/", GoogleAuthView.as_view(), name="auth_google"),
-    path("role/", SetRoleView.as_view(), name="auth_set_role"),
+    path(
+        "capabilities/leasing/manage/",
+        GrantLeaseManagementView.as_view(),
+        name="auth_grant_manage_leases",
+    ),
     path("token/refresh/", JWTTokenRefreshView.as_view(), name="token_refresh"),
 ]

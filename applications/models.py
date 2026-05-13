@@ -11,8 +11,9 @@ class Application(models.Model):
 
     listing = models.ForeignKey(Listing, on_delete=models.CASCADE, related_name="applications")
     renter = models.ForeignKey(
-        Profile, on_delete=models.CASCADE, related_name="applications",
-        limit_choices_to={"role": "renter"}
+        Profile,
+        on_delete=models.CASCADE,
+        related_name="applications",
     )
     status = models.CharField(max_length=10, choices=Status.choices, default=Status.PENDING)
     message = models.TextField(blank=True)

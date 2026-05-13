@@ -4,12 +4,12 @@ from rest_framework import viewsets, filters
 from django_filters.rest_framework import DjangoFilterBackend
 from .models import Listing
 from .serializers import ListingSerializer
-from .permissions import IsLandlordOrReadOnly
+from .permissions import IsLeaseManagerOrReadOnly
 
 
 class ListingViewSet(viewsets.ModelViewSet):
     serializer_class = ListingSerializer
-    permission_classes = [IsLandlordOrReadOnly]
+    permission_classes = [IsLeaseManagerOrReadOnly]
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
 
     # GET /listings/?city=amsterdam&bedrooms=2
@@ -28,5 +28,4 @@ class ListingViewSet(viewsets.ModelViewSet):
         ).prefetch_related("images")
 
     def perform_create(self, serializer):
-        # auto-attach the logged-in landlord's profile
         serializer.save(landlord=self.request.user.profile)
