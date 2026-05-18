@@ -57,14 +57,13 @@ jobs:
           platforms: linux/amd64,linux/arm64
 
       # ------------------------------------------------------------
-      # 5. Trigger infra deploy
+      # 5. Trigger infra deploy (self-hosted VM pulls new image)
       # ------------------------------------------------------------
       - name: Trigger infra deploy
         run: |
           curl -X POST \
             -H "Accept: application/vnd.github+json" \
             -H "Content-Type: application/json" \
-            -H "Authorization: Bearer ${{ secrets.INFRA_PAT }}"
-
+            -H "Authorization: Bearer ${{ secrets.INFRA_PAT }}" \
             https://api.github.com/repos/Dallss/rentapart-infra/dispatches \
             -d '{"event_type":"deploy"}'
