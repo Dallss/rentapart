@@ -13,43 +13,44 @@ class ListingImageSerializer(serializers.ModelSerializer):
         model = ListingImage
         fields = ["id", "image_url", "caption"]
 
+class ListingListSerializer(serializers.ModelSerializer):
+    hero = serializers.SerializerMethodField()
 
-class ListingSerializer(serializers.ModelSerializer):
-    amenities = AmenitySerializer(many=True, read_only=True)
-    amenity_ids = serializers.PrimaryKeyRelatedField(
-        queryset=Amenity.objects.all(),
-        many=True,
-        write_only=True,
-        source="amenities",
-    )
-    images = ListingImageSerializer(many=True, read_only=True)
-    landlord_name = serializers.CharField(source="landlord.user.get_full_name", read_only=True)
+    def get_hero(self, obj):
+        return {
+            "title": obj.title,
+            "image": obj.hero_image,
+            "price": obj.monthly_rent,
+            "city": obj.city,
+        }
 
     class Meta:
         model = Listing
         fields = [
             "id",
-            "landlord",
-            "landlord_name",
-            "title",
-            "description",
-            # Address
-            "country",
-            "city",
-            "neighborhood",
-            "street_address",
-            "latitude",
-            "longitude",
-            # Details
-            "monthly_rent",
-            "bedrooms",
-            "bathrooms",
-            "is_available",
-            "amenities",
-            "amenity_ids",
-            "hero_image",
-            "images",
-            "created_at",
-            "updated_at",
+            "hero",
+            "listing_type",
+            "property_type",
         ]
-        read_only_fields = ["created_at", "updated_at"]
+
+    def perform_create(self, serializer):
+        user = self.request.user
+        if not hasattr(user, "profile"):
+            raise PermissionDenied("User does not have a profile.")
+        serializer.save(landlord=user.profile)
+
+
+class ListingDetailSerializer(serializers.ModelSerializer):
+    images = ListingImageSerializer(many=True, read_only=True)
+    amenities = AmenitySerializer(many=True, read_only=True)
+    landlord = serializers.CharField(source="landlord.user.get_full_name", read_only=True)
+
+    class Meta:
+        model = Listing
+        fields = "__all__"
+
+
+class ListingWriteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Listing
+        exclude = ["landlord", "created_at", "updated_at", "id"]

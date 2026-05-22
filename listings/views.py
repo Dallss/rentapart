@@ -2,12 +2,11 @@ from rest_framework import viewsets, filters
 from rest_framework.exceptions import PermissionDenied
 from django_filters.rest_framework import DjangoFilterBackend
 from .models import Listing
-from .serializers import ListingSerializer
+from .serializers import ListingListSerializer, ListingDetailSerializer, ListingWriteSerializer
 from .permissions import IsLeaseManagerOrReadOnly
 
 
 class ListingViewSet(viewsets.ModelViewSet):
-    serializer_class = ListingSerializer
     permission_classes = [IsLeaseManagerOrReadOnly]
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
 
@@ -16,6 +15,17 @@ class ListingViewSet(viewsets.ModelViewSet):
     ordering_fields = ["monthly_rent", "created_at", "bedrooms"]
     ordering = ["-created_at"]
 
+    def get_serializer_class(self):
+        mapping = {
+            "list": ListingListSerializer,
+            "retrieve": ListingDetailSerializer,
+            "create": ListingWriteSerializer,
+            "update": ListingWriteSerializer,
+            "partial_update": ListingWriteSerializer,
+        }
+
+        return mapping.get(self.action, ListingListSerializer)
+        
     def get_queryset(self):
         qs = Listing.objects.select_related(
             "landlord__user"
