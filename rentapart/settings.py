@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'listings',
     'applications',
     'accounts',
+    'rentapart',
 
 
     "django.contrib.sites",
