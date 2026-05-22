@@ -1,14 +1,12 @@
 import os
 from datetime import timedelta
 from pathlib import Path
-
 from dotenv import load_dotenv
 
 
 # General
 BASE_DIR = Path(__file__).resolve().parent.parent
 load_dotenv(BASE_DIR / ".env")
-
 
 SECRET_KEY = os.getenv("DJANGO_SECRET_KEY")
 DEBUG = True
@@ -126,6 +124,7 @@ AUTH_PASSWORD_VALIDATORS = [
 AUTHENTICATION_BACKENDS = ["allauth.account.auth_backends.AuthenticationBackend"]
 
 # Google Auth 
+# NOTE: secrets are stored in admin site
 STATIC_URL = "static/"
 SITE_ID = 2
 SOCIALACCOUNT_PROVIDERS = {
@@ -151,6 +150,5 @@ USE_TZ = True
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
 STATIC_ROOT = BASE_DIR / 'staticfiles'
-
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
