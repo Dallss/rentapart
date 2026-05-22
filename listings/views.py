@@ -1,6 +1,5 @@
-from django.shortcuts import render
-
 from rest_framework import viewsets, filters
+from rest_framework.exceptions import PermissionDenied
 from django_filters.rest_framework import DjangoFilterBackend
 from .models import Listing
 from .serializers import ListingSerializer
@@ -12,20 +11,30 @@ class ListingViewSet(viewsets.ModelViewSet):
     permission_classes = [IsLeaseManagerOrReadOnly]
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
 
-    # GET /listings/?city=amsterdam&bedrooms=2
     filterset_fields = ["city", "bedrooms", "bathrooms", "is_available"]
-
-    # GET /listings/?search=cozy
-    search_fields = ["title", "description", "address"]
-
-    # GET /listings/?ordering=monthly_rent
+    search_fields = ["title", "description"]
     ordering_fields = ["monthly_rent", "created_at", "bedrooms"]
-    ordering = ["-created_at"]  # default
+    ordering = ["-created_at"]
 
     def get_queryset(self):
-        return Listing.objects.filter(is_available=True).select_related(
+        qs = Listing.objects.select_related(
             "landlord__user"
-        ).prefetch_related("images")
+        ).prefetch_related(
+            "images",
+            "amenities",
+        )
+        # Non-authenticated users and regular users only see available listings
+        # Lease managers and admins see everything
+        user = self.request.user
+        if not user.is_authenticated or not (
+            user.is_staff or user.has_perm("accounts.manage_leases")
+        ):
+            qs = qs.filter(is_available=True)
+
+        return qs
 
     def perform_create(self, serializer):
-        serializer.save(landlord=self.request.user.profile)
+        user = self.request.user
+        if not hasattr(user, "profile"):
+            raise PermissionDenied("User does not have a profile.")
+        serializer.save(landlord=user.profile)
