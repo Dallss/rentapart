@@ -1,9 +1,8 @@
 from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
-
 from accounts.models import Profile
-
+from .choices import ListingType, PropertyType
 
 def _lease_manager_profiles_q():
     ct = ContentType.objects.get_for_model(Profile)
@@ -43,6 +42,17 @@ class Listing(models.Model):
     amenities = models.ManyToManyField("Amenity", blank=True, related_name="listings")
     hero_image = models.URLField(blank=True)
 
+    listing_type = models.CharField(
+        max_length=30,
+        choices=ListingType.choices,
+        blank=True
+    )
+
+    property_type = models.CharField(
+        max_length=30,
+        choices=PropertyType.choices,
+        blank=True
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
