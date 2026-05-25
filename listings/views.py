@@ -4,6 +4,8 @@ from django_filters.rest_framework import DjangoFilterBackend
 from .models import Listing
 from .serializers import ListingListSerializer, ListingDetailSerializer, ListingWriteSerializer
 from .permissions import IsLeaseManagerOrReadOnly
+from django.http import JsonResponse
+from django.db.models import Q
 
 
 class ListingViewSet(viewsets.ModelViewSet):
@@ -26,6 +28,8 @@ class ListingViewSet(viewsets.ModelViewSet):
 
         return mapping.get(self.action, ListingListSerializer)
         
+    from django.db.models import Q
+
     def get_queryset(self):
         qs = Listing.objects.select_related(
             "landlord__user"
@@ -33,15 +37,52 @@ class ListingViewSet(viewsets.ModelViewSet):
             "images",
             "amenities",
         )
-        # Non-authenticated users and regular users only see available listings
-        # Lease managers and admins see everything
+
         user = self.request.user
         if not user.is_authenticated or not (
             user.is_staff or user.has_perm("accounts.manage_leases")
         ):
             qs = qs.filter(is_available=True)
 
+        # Query params
+        q = self.request.query_params.get("q")
+        city = self.request.query_params.get("city")
+        min_rent = self.request.query_params.get("min_rent")
+        max_rent = self.request.query_params.get("max_rent")
+        bedrooms = self.request.query_params.get("bedrooms")
+        property_type = self.request.query_params.get("property_type")
+        listing_type = self.request.query_params.get("listing_type")
+
+        # TEXT SEARCH
+        if q:
+            qs = qs.filter(
+                Q(title__icontains=q) |
+                Q(description__icontains=q) |
+                Q(city__icontains=q) |
+                Q(neighborhood__icontains=q)
+            )
+
+        # FILTERS
+        if city:
+            qs = qs.filter(city__iexact=city)
+
+        if min_rent:
+            qs = qs.filter(monthly_rent__gte=min_rent)
+
+        if max_rent:
+            qs = qs.filter(monthly_rent__lte=max_rent)
+
+        if bedrooms:
+            qs = qs.filter(bedrooms=bedrooms)
+
+        if property_type:
+            qs = qs.filter(property_type=property_type)
+
+        if listing_type:
+            qs = qs.filter(listing_type=listing_type)
+
         return qs
+
 
     def perform_create(self, serializer):
         user = self.request.user

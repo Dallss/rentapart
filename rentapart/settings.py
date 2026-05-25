@@ -126,7 +126,7 @@ AUTHENTICATION_BACKENDS = ["allauth.account.auth_backends.AuthenticationBackend"
 # Google Auth 
 # NOTE: secrets are stored in admin site
 STATIC_URL = "static/"
-SITE_ID = 2
+SITE_ID = int(os.getenv("SITE_ID", 1))
 SOCIALACCOUNT_PROVIDERS = {
     "google": {
         "SCOPE": ["profile", "email"],
