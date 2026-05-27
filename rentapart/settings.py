@@ -14,9 +14,13 @@ if BASE_DIR.joinpath(".env").exists():
 
 SECRET_KEY = os.environ.get("SECRET_KEY", "unsafe-dev-key")
 
-DEBUG = os.environ.get("DEBUG", "False") == "True"
+DEBUG = os.environ.get("DEBUG", "").lower() == "true"
 
-ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "").split(",")
+ALLOWED_HOSTS = [
+    host.strip()
+    for host in os.environ.get("ALLOWED_HOSTS", "").split(",")
+    if host.strip()
+]
 
 REST_FRAMEWORK = {
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
@@ -141,7 +145,12 @@ LOGIN_REDIRECT_URL = "/"
 AUTH_USER_MODEL = "accounts.User"
 
 # Cors
-CORS_ALLOWED_ORIGINS = os.environ.get("ALLOWED_ORIGINS", "").split(",")
+CORS_ALLOWED_ORIGINS = [
+    origin.strip()
+    for origin in os.environ.get("ALLOWED_ORIGINS", "").split(",")
+    if origin.strip()
+]
+CORS_ALLOW_CREDENTIALS = False
 
 LANGUAGE_CODE = "en-us"
 TIME_ZONE = "UTC"
