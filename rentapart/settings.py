@@ -14,8 +14,9 @@ if BASE_DIR.joinpath(".env").exists():
 
 SECRET_KEY = os.environ.get("SECRET_KEY", "unsafe-dev-key")
 
-DEBUG = True
-ALLOWED_HOSTS = []
+DEBUG = os.environ.get("DEBUG", "False") == "True"
+
+ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "").split(",")
 
 REST_FRAMEWORK = {
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
@@ -50,7 +51,6 @@ INSTALLED_APPS = [
     'accounts',
     'rentapart',
     'bookings',
-
 
     "django.contrib.sites",
     "allauth",
@@ -110,7 +110,6 @@ DATABASES = {
 }
 
 # Auth and Users
-
 AUTH_PASSWORD_VALIDATORS = [
     {
         "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
@@ -129,7 +128,7 @@ AUTH_PASSWORD_VALIDATORS = [
 AUTHENTICATION_BACKENDS = ["allauth.account.auth_backends.AuthenticationBackend"]
 
 # Google Auth 
-# NOTE: secrets are stored in admin site
+# NOTE: Secrets are managed by django admin
 STATIC_URL = "static/"
 SITE_ID = int(os.getenv("SITE_ID", 1))
 SOCIALACCOUNT_PROVIDERS = {
@@ -142,10 +141,7 @@ LOGIN_REDIRECT_URL = "/"
 AUTH_USER_MODEL = "accounts.User"
 
 # Cors
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",
-    "http://127.0.0.1:3000",
-]
+CORS_ALLOWED_ORIGINS = os.environ.get("ALLOWED_ORIGINS", "").split(",")
 
 LANGUAGE_CODE = "en-us"
 TIME_ZONE = "UTC"
