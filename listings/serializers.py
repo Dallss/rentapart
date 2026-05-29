@@ -23,6 +23,7 @@ class ListingListSerializer(serializers.ModelSerializer):
             "monthly_rent",
             "city",
             "bedrooms",
+            "rating",
         ]
 
     def perform_create(self, serializer):
