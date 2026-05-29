@@ -20,7 +20,7 @@ class ListingListSerializer(serializers.ModelSerializer):
             "id",
             "title",
             "hero_image",
-            "price",
+            "monthly_rent",
             "city",
             "bedrooms",
         ]
@@ -36,7 +36,10 @@ class ListingDetailSerializer(serializers.ModelSerializer):
     images = ListingImageSerializer(many=True, read_only=True)
     amenities = AmenitySerializer(many=True, read_only=True)
     landlord = serializers.CharField(source="landlord.user.get_full_name", read_only=True)
-
+    listing_type = serializers.CharField(
+        source="listing_type_label",
+        read_only=True
+    )    
     class Meta:
         model = Listing
         fields = "__all__"
