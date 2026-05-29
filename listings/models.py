@@ -28,16 +28,24 @@ class Listing(models.Model):
     country = models.CharField(max_length=100, blank=True)
     city = models.CharField(max_length=100)
     neighborhood = models.CharField(max_length=100, blank=True)
-
     street_address = models.CharField(max_length=255, blank=True)
 
+    # coordinates
     latitude = models.DecimalField(max_digits=9, decimal_places=6, blank=True, null=True)
     longitude = models.DecimalField(max_digits=9, decimal_places=6, blank=True, null=True)
     
     # Details
     monthly_rent = models.DecimalField(max_digits=10, decimal_places=2)
-    bedrooms = models.PositiveIntegerField()
+    bedrooms = models.PositiveSmallIntegerField()
     bathrooms = models.PositiveIntegerField()
+    @property
+    def bedroom_label(self):
+        return (
+            "Studio"
+            if self.bedrooms == 0
+            else f"{self.bedrooms} Bedroom"
+        )
+
     is_available = models.BooleanField(default=True)
     amenities = models.ManyToManyField("Amenity", blank=True, related_name="listings")
     hero_image = models.URLField(blank=True)

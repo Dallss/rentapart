@@ -14,23 +14,15 @@ class ListingImageSerializer(serializers.ModelSerializer):
         fields = ["id", "image_url", "caption"]
 
 class ListingListSerializer(serializers.ModelSerializer):
-    hero = serializers.SerializerMethodField()
-
-    def get_hero(self, obj):
-        return {
-            "title": obj.title,
-            "image": obj.hero_image,
-            "price": obj.monthly_rent,
-            "city": obj.city,
-        }
-
     class Meta:
         model = Listing
         fields = [
             "id",
-            "hero",
-            "listing_type",
-            "property_type",
+            "title",
+            "hero_image",
+            "price",
+            "city",
+            "bedrooms",
         ]
 
     def perform_create(self, serializer):

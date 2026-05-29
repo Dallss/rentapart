@@ -27,8 +27,6 @@ class ListingViewSet(viewsets.ModelViewSet):
         }
 
         return mapping.get(self.action, ListingListSerializer)
-        
-    from django.db.models import Q
 
     def get_queryset(self):
         qs = Listing.objects.select_related(
