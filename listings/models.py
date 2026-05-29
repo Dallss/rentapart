@@ -45,7 +45,13 @@ class Listing(models.Model):
             if self.bedrooms == 0
             else f"{self.bedrooms} Bedroom"
         )
-
+    rating = models.DecimalField(
+        max_digits=2,
+        decimal_places=1,
+        null=True,
+        blank=True,
+        default=None
+    )
     is_available = models.BooleanField(default=True)
     amenities = models.ManyToManyField("Amenity", blank=True, related_name="listings")
     hero_image = models.URLField(blank=True)
