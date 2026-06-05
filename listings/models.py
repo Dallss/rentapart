@@ -27,6 +27,7 @@ class Listing(models.Model):
     # Address
     country = models.CharField(max_length=100, blank=True)
     city = models.CharField(max_length=100)
+    city_google_place_id = models.CharField(max_length=100, blank=True)
     neighborhood = models.CharField(max_length=100, blank=True)
     street_address = models.CharField(max_length=255, blank=True)
 
