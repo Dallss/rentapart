@@ -12,7 +12,7 @@ class ListingViewSet(viewsets.ModelViewSet):
     permission_classes = [IsLeaseManagerOrReadOnly]
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
 
-    filterset_fields = ["city", "bedrooms", "bathrooms", "is_available"]
+    filterset_fields = ["city_google_place_id", "bedrooms", "bathrooms", "is_available", "is_featured"]
     search_fields = ["title", "description"]
     ordering_fields = ["monthly_rent", "created_at", "bedrooms"]
     ordering = ["-created_at"]
@@ -44,12 +44,13 @@ class ListingViewSet(viewsets.ModelViewSet):
 
         # Query params
         q = self.request.query_params.get("q")
-        city = self.request.query_params.get("city")
+        city_place_id = self.request.query_params.get("city_place_id")
         min_rent = self.request.query_params.get("min_rent")
         max_rent = self.request.query_params.get("max_rent")
         bedrooms = self.request.query_params.get("bedrooms")
         property_type = self.request.query_params.get("property_type")
         listing_type = self.request.query_params.get("listing_type")
+        is_featured = self.request.query_params.get("is_featured")
 
         # TEXT SEARCH
         if q:
@@ -61,8 +62,8 @@ class ListingViewSet(viewsets.ModelViewSet):
             )
 
         # FILTERS
-        if city:
-            qs = qs.filter(city__iexact=city)
+        if city_place_id:
+            qs = qs.filter(city_google_place_id=city_place_id)
 
         if min_rent:
             qs = qs.filter(monthly_rent__gte=min_rent)
@@ -78,6 +79,9 @@ class ListingViewSet(viewsets.ModelViewSet):
 
         if listing_type:
             qs = qs.filter(listing_type=listing_type)
+        
+        if is_featured is not None:
+            qs = qs.filter(is_featured=is_featured.lower() == "true")
 
         return qs
 
