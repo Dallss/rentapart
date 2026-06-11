@@ -14,6 +14,9 @@ class ListingImageSerializer(serializers.ModelSerializer):
         fields = ["id", "image_url", "caption"]
 
 class ListingListSerializer(serializers.ModelSerializer):
+    # TODO: rename db field to lat and lng
+    lat = serializers.FloatField(source="latitude")
+    lng = serializers.FloatField(source="longitude")
     class Meta:
         model = Listing
         fields = [
@@ -24,6 +27,8 @@ class ListingListSerializer(serializers.ModelSerializer):
             "city",
             "bedrooms",
             "rating",
+            "lat",
+            "lng"
         ]
 
     def perform_create(self, serializer):

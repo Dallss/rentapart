@@ -6,13 +6,14 @@ from .serializers import ListingListSerializer, ListingDetailSerializer, Listing
 from .permissions import IsLeaseManagerOrReadOnly
 from django.http import JsonResponse
 from django.db.models import Q
+from .filters import ListingFilter
 
 
 class ListingViewSet(viewsets.ModelViewSet):
     permission_classes = [IsLeaseManagerOrReadOnly]
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
 
-    filterset_fields = ["city_google_place_id", "bedrooms", "bathrooms", "is_available", "is_featured"]
+    filterset_class = ListingFilter
     search_fields = ["title", "description"]
     ordering_fields = ["monthly_rent", "created_at", "bedrooms"]
     ordering = ["-created_at"]
@@ -41,47 +42,6 @@ class ListingViewSet(viewsets.ModelViewSet):
             user.is_staff or user.has_perm("accounts.manage_leases")
         ):
             qs = qs.filter(is_available=True)
-
-        # Query params
-        q = self.request.query_params.get("q")
-        city_place_id = self.request.query_params.get("city_place_id")
-        min_rent = self.request.query_params.get("min_rent")
-        max_rent = self.request.query_params.get("max_rent")
-        bedrooms = self.request.query_params.get("bedrooms")
-        property_type = self.request.query_params.get("property_type")
-        listing_type = self.request.query_params.get("listing_type")
-        is_featured = self.request.query_params.get("is_featured")
-
-        # TEXT SEARCH
-        if q:
-            qs = qs.filter(
-                Q(title__icontains=q) |
-                Q(description__icontains=q) |
-                Q(city__icontains=q) |
-                Q(neighborhood__icontains=q)
-            )
-
-        # FILTERS
-        if city_place_id:
-            qs = qs.filter(city_google_place_id=city_place_id)
-
-        if min_rent:
-            qs = qs.filter(monthly_rent__gte=min_rent)
-
-        if max_rent:
-            qs = qs.filter(monthly_rent__lte=max_rent)
-
-        if bedrooms:
-            qs = qs.filter(bedrooms=bedrooms)
-
-        if property_type:
-            qs = qs.filter(property_type=property_type)
-
-        if listing_type:
-            qs = qs.filter(listing_type=listing_type)
-        
-        if is_featured is not None:
-            qs = qs.filter(is_featured=is_featured.lower() == "true")
 
         return qs
 
