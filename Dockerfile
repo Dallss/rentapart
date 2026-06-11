@@ -21,4 +21,5 @@ python manage.py seed_listings && \
 python manage.py seed_mandaue_listings && \
 python manage.py seed_lapu_lapu_listings && \
 python manage.py seed_landlord && \
+python manage.py backfill_city_place_ids && \
 gunicorn rentapart.wsgi:application --bind 0.0.0.0:$PORT"]
