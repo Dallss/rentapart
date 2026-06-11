@@ -25,6 +25,7 @@ class ListingFilter(django_filters.FilterSet):
             "is_featured",
             "listing_type",
             "property_type",
+            "is_furnished",
         ]
 
     def filter_q(self, queryset, name, value):

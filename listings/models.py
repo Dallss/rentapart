@@ -39,6 +39,8 @@ class Listing(models.Model):
     monthly_rent = models.DecimalField(max_digits=10, decimal_places=2)
     bedrooms = models.PositiveSmallIntegerField()
     bathrooms = models.PositiveIntegerField()
+    is_furnished = models.BooleanField(null=True, blank=True)
+
     @property
     def bedroom_label(self):
         return (
