@@ -10,6 +10,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.views import TokenRefreshView
+from rest_framework.response import Response
 
 from .models import Profile
 from .serializers import GoogleAuthSerializer
@@ -99,14 +100,30 @@ class GoogleAuthView(APIView):
         profile = user.profile
 
         refresh = RefreshToken.for_user(user)
-        return Response(
-            {
-                "access": str(refresh.access_token),
-                "refresh": str(refresh),
-                "user": _user_payload(user, profile),
-            },
-            status=status.HTTP_200_OK,
+        
+        data = {
+            "user": _user_payload(user, profile),
+        }
+
+        response = Response(data, status=status.HTTP_200_OK)
+        
+        response.set_cookie(
+            "access_token",
+            str(refresh.access_token),
+            httponly=True,
+            secure=True,
+            samesite="Lax",
         )
+
+        response.set_cookie(
+            "refresh_token",
+            str(refresh),
+            httponly=True,
+            secure=True,
+            samesite="Lax",
+        )
+
+        return response
 
 
 class GrantLeaseManagementView(APIView):
