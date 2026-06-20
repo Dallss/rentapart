@@ -71,36 +71,41 @@ class GoogleAuthView(APIView):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
+
         email = idinfo.get("email")
-        if not email:
+
+        if not email or not idinfo.get("email_verified", False):
             return Response(
-                {"detail": "Google token did not include an email."},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-        if not idinfo.get("email_verified", False):
-            return Response(
-                {"detail": "Google email is not verified."},
+                {"detail": "Verified Google email is required."},
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
         sub = idinfo.get("sub") or ""
+
         user, created = User.objects.get_or_create(
             email=email,
-            defaults={"username": _username_for_google(sub, email)},
+            defaults={
+                "username": _username_for_google(sub, email),
+            },
         )
+
         if created:
             user.set_unusable_password()
             user.save(update_fields=["password"])
 
         profile = user.profile
+
         refresh = RefreshToken.for_user(user)
-        
+
+        needs_onboarding = created
+
         data = {
             "user": _user_payload(user, profile),
+            "needs_onboarding": needs_onboarding,
         }
 
         response = Response(data, status=status.HTTP_200_OK)
-        
+
         response.set_cookie(
             "access_token",
             str(refresh.access_token),
