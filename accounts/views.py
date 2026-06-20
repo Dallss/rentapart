@@ -11,12 +11,12 @@ from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.views import TokenRefreshView
 from rest_framework.response import Response
+import re
 
 from .models import Profile
 from .serializers import GoogleAuthSerializer, ProfileSerializer
 
 User = get_user_model()
-
 
 def _username_for_google(sub: str, email: str) -> str:
     base = f"g_{sub}"
@@ -106,7 +106,7 @@ class GoogleAuthView(APIView):
 
         data = {
             "user": _user_payload(user, profile),
-            "needs_onboarding": created,
+            "needs_onboarding": profile.needs_onboarding,
         }
 
         response = Response(data, status=status.HTTP_200_OK)
@@ -141,6 +141,8 @@ class OnboardingView(APIView):
         phone = request.data.get("phone")
 
         missing = {}
+        PHONE_REGEX = re.compile(r"^\+?[0-9]{7,15}$")
+
 
         if not display_name:
             missing["display_name"] = "This field is required"
@@ -150,6 +152,9 @@ class OnboardingView(APIView):
         
         if not phone:
             missing["phone"] = "This field is required"
+
+        elif not PHONE_REGEX.match(phone):
+            missing["phone"] = "Invalid phone number format"
 
         if missing:
             return Response(
@@ -162,6 +167,7 @@ class OnboardingView(APIView):
 
         profile.display_name = display_name
         profile.birthday = birthday
+        profile.phone = phone
         profile.save()
 
         return Response({
@@ -169,6 +175,7 @@ class OnboardingView(APIView):
             "profile": {
                 "display_name": profile.display_name,
                 "birthday": profile.birthday,
+                "phone": profile.phone,
             },
             "needs_onboarding": False,
         })

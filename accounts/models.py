@@ -28,6 +28,10 @@ class Profile(models.Model):
             ("manage_leases", "Can create and manage lease listings"),
         ]
 
+    @property
+    def needs_onboarding(self):
+            return not self.display_name or not self.birthday or not self.phone
+            
     def can_manage_leases(self):
         return self.user.has_perm(MANAGE_LEASES_PERMISSION)
 
