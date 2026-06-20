@@ -13,7 +13,7 @@ from rest_framework_simplejwt.views import TokenRefreshView
 from rest_framework.response import Response
 
 from .models import Profile
-from .serializers import GoogleAuthSerializer
+from .serializers import GoogleAuthSerializer, ProfileSerializer
 
 User = get_user_model()
 
@@ -51,6 +51,7 @@ def _manage_leases_permission():
 
 
 class GoogleAuthView(APIView):
+    authentication_classes = []
     permission_classes = [AllowAny]
 
     def post(self, request):
@@ -123,6 +124,10 @@ class GoogleAuthView(APIView):
             samesite="Lax",
         )
 
+        print("VIEW HIT")
+        print("AUTH HEADER:", request.headers.get("Authorization"))
+        print("COOKIES:", request.COOKIES)
+
         return response
 
 
@@ -145,3 +150,23 @@ class JWTTokenRefreshView(TokenRefreshView):
     """Same as simplejwt refresh; exposed at /api/auth/token/refresh/."""
 
     pass
+    
+
+class Me(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        profile = ProfileSerializer(request.user.profile)
+
+        return Response(
+            {
+                "profile": profile.data,
+            }
+        )
+
+
+class Protected(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        return Response({"Response": "u good"}, status=status.HTTP_200_OK)
