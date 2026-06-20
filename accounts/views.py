@@ -154,7 +154,7 @@ class OnboardingView(APIView):
             },
             "needs_onboarding": False,
         })
-
+        
 class GrantLeaseManagementView(APIView):
     """
     Optional upgrade: assign ``accounts.manage_leases`` to the user (idempotent).
