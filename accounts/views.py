@@ -129,6 +129,40 @@ class GoogleAuthView(APIView):
         return response
 
 
+class OnboardingView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        user = request.user
+        profile = user.profile
+
+        username = request.data.get("username")
+        birthday = request.data.get("birthday")
+
+        if not username or not birthday:
+            return Response(
+                {"detail": "username and birthday are required"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+            
+        user.username = username
+        user.save(update_fields=["username"])
+
+        profile.birthday = birthday
+        profile.save(update_fields=["birthday"])
+
+        return Response({
+            "success": True,
+            "user": {
+                "email": user.email,
+                "username": user.username,
+            },
+            "profile": {
+                "birthday": profile.birthday,
+            },
+            "needs_onboarding": False,
+        })
+
 class GrantLeaseManagementView(APIView):
     """
     Optional upgrade: assign ``accounts.manage_leases`` to the user (idempotent).
