@@ -135,10 +135,25 @@ class OnboardingView(APIView):
 
         display_name = request.data.get("display_name")
         birthday = request.data.get("birthday")
+        phone = request.data.get("phone")
 
-        if not display_name or not birthday:
+        missing = {}
+
+        if not display_name:
+            missing["display_name"] = "This field is required"
+
+        if not birthday:
+            missing["birthday"] = "This field is required"
+        
+        if not phone:
+            missing["phone"] = "This field is required"
+
+        if missing:
             return Response(
-                {"detail": "display_name and birthday are required"},
+                {
+                    "detail": "Onboarding incomplete",
+                    "missing_fields": missing
+                },
                 status=400,
             )
 

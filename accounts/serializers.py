@@ -12,12 +12,11 @@ class GoogleAuthSerializer(serializers.Serializer):
 
 class ProfileSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(source="user.email", read_only=True)
-    username = serializers.CharField(source="user.username", read_only=True)
     capabilities = serializers.SerializerMethodField()
 
     class Meta:
         model = Profile
-        fields = ["email", "username", "capabilities", "phone", "bio", "avatar"]
+        fields = ["email", "display_name", "capabilities", "phone", "avatar_url", "birthday"]
         read_only_fields = ["capabilities"]
 
     def get_capabilities(self, obj):
