@@ -82,11 +82,16 @@ class GoogleAuthView(APIView):
 
         sub = idinfo.get("sub") or ""
         picture = idinfo.get("picture")
+        name = idinfo.get("name")
+        given_name = idinfo.get("given_name", "")
+        family_name = idinfo.get("family_name", "")
 
         user, created = User.objects.get_or_create(
             email=email,
             defaults={
                 "username": _username_for_google(sub, email),
+                "first_name": given_name,
+                "last_name": family_name,
             },
         )
 
@@ -96,9 +101,16 @@ class GoogleAuthView(APIView):
 
         profile, _ = Profile.objects.get_or_create(user=user)
 
-        if created and picture:
-            profile.avatar_url = picture
-            profile.save(update_fields=["avatar_url"])
+        if created:
+            update_fields = []
+            if picture:
+                profile.avatar_url = picture
+                update_fields.append("avatar_url")
+            if name:
+                profile.display_name = name
+                update_fields.append("display_name")
+            if update_fields:
+                profile.save(update_fields=update_fields)
 
         profile = user.profile
 
@@ -144,13 +156,13 @@ class OnboardingView(APIView):
         PHONE_REGEX = re.compile(r"^\+?[0-9]{7,15}$")
 
 
-        if not display_name:
+        if not profile.display_name and not display_name:
             missing["display_name"] = "This field is required"
 
-        if not birthday:
+        if not profile.birthday and not birthday:
             missing["birthday"] = "This field is required"
         
-        if not phone:
+        if not profile.phone and not phone:
             missing["phone"] = "This field is required"
 
         elif not PHONE_REGEX.match(phone):
