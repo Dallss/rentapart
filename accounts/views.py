@@ -81,6 +81,7 @@ class GoogleAuthView(APIView):
             )
 
         sub = idinfo.get("sub") or ""
+        picture = idinfo.get("picture")
 
         user, created = User.objects.get_or_create(
             email=email,
@@ -92,16 +93,17 @@ class GoogleAuthView(APIView):
         if created:
             user.set_unusable_password()
             user.save(update_fields=["password"])
+            profile = user.profile
+            profile.avatar_url = picture 
+            profile.save(update_fields=["avatar_url"])
 
         profile = user.profile
 
         refresh = RefreshToken.for_user(user)
 
-        needs_onboarding = created
-
         data = {
             "user": _user_payload(user, profile),
-            "needs_onboarding": needs_onboarding,
+            "needs_onboarding": created,
         }
 
         response = Response(data, status=status.HTTP_200_OK)
@@ -122,10 +124,6 @@ class GoogleAuthView(APIView):
             samesite="Lax",
         )
 
-        print("VIEW HIT")
-        print("AUTH HEADER:", request.headers.get("Authorization"))
-        print("COOKIES:", request.COOKIES)
-
         return response
 
 
@@ -133,31 +131,25 @@ class OnboardingView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
-        user = request.user
-        profile = user.profile
+        profile = request.user.profile
 
-        username = request.data.get("username")
+        display_name = request.data.get("display_name")
         birthday = request.data.get("birthday")
 
-        if not username or not birthday:
+        if not display_name or not birthday:
             return Response(
-                {"detail": "username and birthday are required"},
-                status=status.HTTP_400_BAD_REQUEST,
+                {"detail": "display_name and birthday are required"},
+                status=400,
             )
-            
-        user.username = username
-        user.save(update_fields=["username"])
 
+        profile.display_name = display_name
         profile.birthday = birthday
-        profile.save(update_fields=["birthday"])
+        profile.save()
 
         return Response({
             "success": True,
-            "user": {
-                "email": user.email,
-                "username": user.username,
-            },
             "profile": {
+                "display_name": profile.display_name,
                 "birthday": profile.birthday,
             },
             "needs_onboarding": False,
