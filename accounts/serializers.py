@@ -16,7 +16,7 @@ class ProfileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Profile
-        fields = ["email", "display_name", "capabilities", "phone", "avatar_url", "birthday"]
+        fields = ["email", "display_name", "capabilities", "phone", "avatar_url", "birthday", "needs_onboarding"]
         read_only_fields = ["capabilities"]
 
     def get_capabilities(self, obj):
