@@ -6,4 +6,5 @@ from .models import User, Profile
 @receiver(post_save, sender=User)
 def create_profile(sender, instance, created, **kwargs):
     if created:
+        print('sd')
         Profile.objects.get_or_create(user=instance)

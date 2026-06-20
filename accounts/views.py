@@ -93,8 +93,11 @@ class GoogleAuthView(APIView):
         if created:
             user.set_unusable_password()
             user.save(update_fields=["password"])
-            profile = user.profile
-            profile.avatar_url = picture 
+
+        profile, _ = Profile.objects.get_or_create(user=user)
+
+        if created and picture:
+            profile.avatar_url = picture
             profile.save(update_fields=["avatar_url"])
 
         profile = user.profile

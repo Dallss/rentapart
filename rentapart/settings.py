@@ -53,15 +53,11 @@ INSTALLED_APPS = [
 
     'listings',
     'applications',
-    'accounts',
+    "accounts.apps.AccountsConfig",
     'rentapart',
     'bookings',
 
     "django.contrib.sites",
-    "allauth",
-    "allauth.account",
-    "allauth.socialaccount",
-    "allauth.socialaccount.providers.google",
     "drf_spectacular",
     "django_filters",
 ]
@@ -76,7 +72,6 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 
-    "allauth.account.middleware.AccountMiddleware", 
 ]
 
 # Url And WSGI
@@ -137,8 +132,6 @@ AUTH_PASSWORD_VALIDATORS = [
         "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
     },
 ]
-
-AUTHENTICATION_BACKENDS = ["allauth.account.auth_backends.AuthenticationBackend"]
 
 # Google Auth 
 # NOTE: Secrets are managed by django admin
