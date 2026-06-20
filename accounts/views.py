@@ -55,12 +55,6 @@ class GoogleAuthView(APIView):
     permission_classes = [AllowAny]
 
     def post(self, request):
-        if not settings.GOOGLE_CLIENT_ID:
-            return Response(
-                {"detail": "Server is missing GOOGLE_CLIENT_ID configuration."},
-                status=status.HTTP_503_SERVICE_UNAVAILABLE,
-            )
-
         ser = GoogleAuthSerializer(data=request.data)
         ser.is_valid(raise_exception=True)
         raw_token = ser.validated_data["id_token"]
@@ -99,7 +93,6 @@ class GoogleAuthView(APIView):
             user.save(update_fields=["password"])
 
         profile = user.profile
-
         refresh = RefreshToken.for_user(user)
         
         data = {
