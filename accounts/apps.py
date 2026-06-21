@@ -1,4 +1,6 @@
 from django.apps import AppConfig
+from django.conf import settings
+from django.core.exceptions import ImproperlyConfigured
 
 
 class AccountsConfig(AppConfig):
@@ -7,3 +9,8 @@ class AccountsConfig(AppConfig):
 
     def ready(self):
         import accounts.signals
+
+        if not settings.GOOGLE_CLIENT_ID:
+            raise ImproperlyConfigured(
+                "GOOGLE_CLIENT_ID is required"
+            )

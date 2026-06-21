@@ -27,7 +27,7 @@ REST_FRAMEWORK = {
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
     "DEFAULT_FILTER_BACKENDS": ["django_filters.rest_framework.DjangoFilterBackend"],
     "DEFAULT_AUTHENTICATION_CLASSES": [
-        "rest_framework_simplejwt.authentication.JWTAuthentication",
+        "accounts.authentication.CookieJWTAuthentication",
     ],
 }
 
@@ -53,15 +53,11 @@ INSTALLED_APPS = [
 
     'listings',
     'applications',
-    'accounts',
+    "accounts.apps.AccountsConfig",
     'rentapart',
     'bookings',
 
     "django.contrib.sites",
-    "allauth",
-    "allauth.account",
-    "allauth.socialaccount",
-    "allauth.socialaccount.providers.google",
     "drf_spectacular",
     "django_filters",
 ]
@@ -76,7 +72,6 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 
-    "allauth.account.middleware.AccountMiddleware", 
 ]
 
 # Url And WSGI
@@ -138,8 +133,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-AUTHENTICATION_BACKENDS = ["allauth.account.auth_backends.AuthenticationBackend"]
-
 # Google Auth 
 # NOTE: Secrets are managed by django admin
 STATIC_URL = "static/"
@@ -159,7 +152,7 @@ CORS_ALLOWED_ORIGINS = [
     for origin in os.environ.get("ALLOWED_ORIGINS", "").split(",")
     if origin.strip()
 ]
-CORS_ALLOW_CREDENTIALS = False
+CORS_ALLOW_CREDENTIALS = True
 
 LANGUAGE_CODE = "en-us"
 TIME_ZONE = "UTC"

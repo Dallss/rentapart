@@ -17,17 +17,21 @@ class Profile(models.Model):
     managing listings requires the ``accounts.manage_leases`` permission (grant
     via API upgrade, admin, or groups).
     """
-
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="profile")
+    display_name = models.CharField(max_length=150, blank=True)
     phone = models.CharField(max_length=20, blank=True)
-    bio = models.TextField(blank=True)
-    avatar = models.ImageField(upload_to="avatars/", blank=True, null=True)
+    birthday = models.DateField(null=True, blank=True)
+    avatar_url = models.URLField(blank=True, null=True)
 
     class Meta:
         permissions = [
             ("manage_leases", "Can create and manage lease listings"),
         ]
 
+    @property
+    def needs_onboarding(self):
+            return not self.display_name or not self.birthday or not self.phone
+            
     def can_manage_leases(self):
         return self.user.has_perm(MANAGE_LEASES_PERMISSION)
 
