@@ -128,7 +128,7 @@ class GoogleAuthView(APIView):
             str(refresh.access_token),
             httponly=True,
             secure=True,
-            samesite="Lax",
+            samesite="None",
         )
 
         response.set_cookie(
@@ -136,7 +136,7 @@ class GoogleAuthView(APIView):
             str(refresh),
             httponly=True,
             secure=True,
-            samesite="Lax",
+            samesite="None",
         )
 
         return response
