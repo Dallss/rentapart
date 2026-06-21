@@ -142,6 +142,28 @@ class GoogleAuthView(APIView):
         return response
 
 
+class Logout(APIView):
+    authentication_classes = []
+    permission_classes = [AllowAny]
+    def post(self, request):
+        print("logged out")
+        response = Response(
+            {"detail": "Logout successful!"},
+            status=status.HTTP_200_OK
+        )
+
+        response.delete_cookie(
+            "access_token",
+            samesite="None"
+        )
+        response.delete_cookie(
+            "refresh_token",
+            samesite="None"
+        )
+
+        return response
+
+
 class OnboardingView(APIView):
     permission_classes = [IsAuthenticated]
 

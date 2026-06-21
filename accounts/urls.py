@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import GoogleAuthView, GrantLeaseManagementView, JWTTokenRefreshView, Protected, Me, OnboardingView
+from .views import GoogleAuthView, Logout, GrantLeaseManagementView, JWTTokenRefreshView, Protected, Me, OnboardingView
 
 urlpatterns = [
     path("google/", GoogleAuthView.as_view(), name="auth_google"),
@@ -12,4 +12,5 @@ urlpatterns = [
     path("protected/", Protected.as_view(), name="protected"),
     path("me/", Me.as_view(), name="me"),
     path("onboarding/", OnboardingView.as_view(), name="onboarding"),
+    path("logout/", Logout.as_view(), name="logout"),
 ]
