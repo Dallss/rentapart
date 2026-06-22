@@ -52,6 +52,25 @@ class ListingDetailSerializer(serializers.ModelSerializer):
 
 
 class ListingWriteSerializer(serializers.ModelSerializer):
+    amenities = serializers.PrimaryKeyRelatedField(
+        many=True,
+        queryset=Amenity.objects.all()
+    )
     class Meta:
         model = Listing
-        exclude = ["landlord", "created_at", "updated_at", "id"]
+        fields = [
+            "title",
+            "description",
+            "country",
+            "city",
+            "neighborhood",
+            "street_address",
+            "monthly_rent",
+            "bedrooms",
+            "bathrooms",
+            "is_furnished",
+            "amenities",
+            "hero_image",
+            "listing_type",
+            "property_type",
+        ]

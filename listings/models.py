@@ -57,7 +57,10 @@ class Listing(models.Model):
     )
     is_available = models.BooleanField(default=True)
     amenities = models.ManyToManyField("Amenity", blank=True, related_name="listings")
-    hero_image = models.URLField(blank=True)
+    hero_image = models.URLField(
+        blank=True,
+        default="https://res.cloudinary.com/braveheartimages/image/upload/v1782165141/eioh6ottrzthsla6unjw.jpg"
+    )
     is_featured = models.BooleanField(default=False, db_index=True)
 
     listing_type = models.CharField(

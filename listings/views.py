@@ -4,9 +4,13 @@ from django_filters.rest_framework import DjangoFilterBackend
 from .models import Listing
 from .serializers import ListingListSerializer, ListingDetailSerializer, ListingWriteSerializer
 from .permissions import IsLeaseManagerOrReadOnly
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from django.http import JsonResponse
 from django.db.models import Q
 from .filters import ListingFilter
+from rest_framework.decorators import action
+from rest_framework.response import Response
+from .models import Amenity
 
 
 class ListingViewSet(viewsets.ModelViewSet):
@@ -54,3 +58,19 @@ class ListingViewSet(viewsets.ModelViewSet):
         if not hasattr(user, "profile"):
             raise PermissionDenied("User does not have a profile.")
         serializer.save(landlord=user.profile)
+
+        def validate_hero_image(self, value):
+            if not value:
+                raise serializers.ValidationError("Hero image is required.")
+            return value
+
+
+    @action(detail=False, methods=["get"])
+    def metadata(self, request):
+        return Response({
+            "amenities": list(
+                Amenity.objects.order_by("name").values("id", "name", "icon")
+            ),
+            "listing_types": Listing._meta.get_field("listing_type").choices,
+            "property_types": Listing._meta.get_field("property_type").choices,
+        })
