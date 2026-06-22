@@ -17,6 +17,7 @@ from .models import Profile
 from .serializers import GoogleAuthSerializer, ProfileSerializer
 
 User = get_user_model()
+PHONE_REGEX = re.compile(r"^\+?[0-9]{7,15}$")
 
 def _username_for_google(sub: str, email: str) -> str:
     base = f"g_{sub}"
@@ -162,7 +163,42 @@ class Logout(APIView):
         )
 
         return response
+        
 
+class UpdateProfileView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def patch(self, request):
+        profile = request.user.profile
+
+        display_name = request.data.get("display_name", profile.display_name)
+        birthday = request.data.get("birthday", profile.birthday)
+        phone = request.data.get("phone", profile.phone)
+
+        errors = {}
+
+        if phone and not PHONE_REGEX.match(phone):
+            errors["phone"] = "Invalid phone number format"
+
+        if errors:
+            return Response(
+                {"detail": "Invalid update", "errors": errors},
+                status=400
+            )
+
+        profile.display_name = display_name
+        profile.birthday = birthday
+        profile.phone = phone
+        profile.save()
+
+        return Response({
+            "success": True,
+            "profile": {
+                "display_name": profile.display_name,
+                "birthday": profile.birthday,
+                "phone": profile.phone,
+            }
+        })
 
 class OnboardingView(APIView):
     permission_classes = [IsAuthenticated]
@@ -175,9 +211,6 @@ class OnboardingView(APIView):
         phone = request.data.get("phone")
 
         missing = {}
-        PHONE_REGEX = re.compile(r"^\+?[0-9]{7,15}$")
-
-
         if not profile.display_name and not display_name:
             missing["display_name"] = "This field is required"
 
