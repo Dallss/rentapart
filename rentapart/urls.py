@@ -33,6 +33,7 @@ urlpatterns = [
     path("api/", include("listings.urls")),
     path("api/", include("bookings.urls")),
     path("api/auth/", include("accounts.urls")), 
+    path("api/media/", include("media.urls")),
 ]
 
 if settings.DEBUG:

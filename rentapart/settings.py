@@ -56,6 +56,7 @@ INSTALLED_APPS = [
     "accounts.apps.AccountsConfig",
     'rentapart',
     'bookings',
+    "media",
 
     "django.contrib.sites",
     "drf_spectacular",
@@ -164,3 +165,10 @@ MEDIA_ROOT = BASE_DIR / "media"
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+
+CLOUDINARY = {
+    "cloud_name": os.getenv("CLOUDINARY_CLOUD_NAME"),
+    "api_key": os.getenv("CLOUDINARY_API_KEY"),
+    "api_secret": os.getenv("CLOUDINARY_API_SECRET"),
+}

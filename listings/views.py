@@ -30,14 +30,17 @@ class ListingViewSet(viewsets.ModelViewSet):
         return mapping.get(self.action, ListingListSerializer)
 
     def get_queryset(self):
-        qs = Listing.objects.select_related(
-            "landlord__user"
-        ).prefetch_related(
-            "images",
-            "amenities",
+        qs = Listing.objects.select_related("landlord__user").prefetch_related(
+            "images", "amenities"
         )
 
         user = self.request.user
+
+        if self.request.query_params.get("mine") == "true":
+            if not user.is_authenticated:
+                return qs.none()
+            return qs.filter(landlord=user.profile)
+
         if not user.is_authenticated or not (
             user.is_staff or user.has_perm("accounts.manage_leases")
         ):
