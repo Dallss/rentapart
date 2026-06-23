@@ -40,6 +40,7 @@ class Listing(models.Model):
     bedrooms = models.PositiveSmallIntegerField()
     bathrooms = models.PositiveIntegerField()
     is_furnished = models.BooleanField(null=True, blank=True)
+    is_unfinished = models.BooleanField(default=True)
 
     @property
     def bedroom_label(self):

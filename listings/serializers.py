@@ -86,4 +86,5 @@ class ListingWriteSerializer(serializers.ModelSerializer):
             "hero_image_url",
             "listing_type",
             "property_type",
+            "is_unfinished",
         ]
