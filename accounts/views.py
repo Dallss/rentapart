@@ -143,6 +143,33 @@ class GoogleAuthView(APIView):
         return response
 
 
+class TokenRefreshView(APIView):
+    authentication_classes = []
+
+    def post(self, request):
+        raw_refresh = request.COOKIES.get("refresh_token")
+
+        if not raw_refresh:
+            return Response({"detail": "No refresh token"}, status=status.HTTP_401_UNAUTHORIZED)
+
+        try:
+            refresh = RefreshToken(raw_refresh) 
+            new_access = str(refresh.access_token)
+
+            refresh.set_jti()        # new unique ID
+            refresh.set_exp()        # reset expiry
+            new_refresh = str(refresh)
+
+        except Exception:
+            return Response({"detail": "Invalid or expired token"}, status=status.HTTP_401_UNAUTHORIZED)
+
+        response = Response({"detail": "Token refreshed"})
+        response.set_cookie("access_token", new_access, httponly=True, secure=True, samesite="None",)
+        response.set_cookie("refresh_token", new_refresh, httponly=True, secure=True, samesite="None",)
+
+        return response
+
+
 class Logout(APIView):
     authentication_classes = []
     permission_classes = [AllowAny]
@@ -261,12 +288,6 @@ class GrantLeaseManagementView(APIView):
         user = User.objects.get(pk=request.user.pk)
         return Response(_user_payload(user, user.profile), status=status.HTTP_200_OK)
 
-
-class JWTTokenRefreshView(TokenRefreshView):
-    """Same as simplejwt refresh; exposed at /api/auth/token/refresh/."""
-
-    pass
-    
 
 class Me(APIView):
     permission_classes = [IsAuthenticated]
