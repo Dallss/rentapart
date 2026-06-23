@@ -1,8 +1,8 @@
-from rest_framework import viewsets, filters
+from rest_framework import viewsets, filters, permissions, mixins
 from rest_framework.exceptions import PermissionDenied
 from django_filters.rest_framework import DjangoFilterBackend
 from .models import Listing
-from .serializers import ListingListSerializer, ListingDetailSerializer, ListingWriteSerializer
+from .serializers import ListingListSerializer, ListingDetailSerializer, ListingWriteSerializer, ListingImageSerializer
 from .permissions import IsLeaseManagerOrReadOnly
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from django.http import JsonResponse
@@ -59,11 +59,6 @@ class ListingViewSet(viewsets.ModelViewSet):
             raise PermissionDenied("User does not have a profile.")
         serializer.save(landlord=user.profile)
 
-        def validate_hero_image(self, value):
-            if not value:
-                raise serializers.ValidationError("Hero image is required.")
-            return value
-
 
     @action(detail=False, methods=["get"])
     def metadata(self, request):
@@ -74,3 +69,10 @@ class ListingViewSet(viewsets.ModelViewSet):
             "listing_types": Listing._meta.get_field("listing_type").choices,
             "property_types": Listing._meta.get_field("property_type").choices,
         })
+
+class ListingImageViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin):
+    serializer_class = ListingImageSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def perform_create(self, serializer):
+        serializer.save(listing_id=self.kwargs["listing_pk"])

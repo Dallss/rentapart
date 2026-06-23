@@ -56,6 +56,18 @@ class ListingWriteSerializer(serializers.ModelSerializer):
         many=True,
         queryset=Amenity.objects.all()
     )
+
+    city_google_place_id = serializers.CharField(
+        required=True,
+        allow_blank=False
+    )
+
+    hero_image_url = serializers.URLField(
+        source="hero_image",
+        required=True,
+        allow_blank=False
+    )
+
     class Meta:
         model = Listing
         fields = [
@@ -63,6 +75,7 @@ class ListingWriteSerializer(serializers.ModelSerializer):
             "description",
             "country",
             "city",
+            "city_google_place_id",
             "neighborhood",
             "street_address",
             "monthly_rent",
@@ -70,7 +83,7 @@ class ListingWriteSerializer(serializers.ModelSerializer):
             "bathrooms",
             "is_furnished",
             "amenities",
-            "hero_image",
+            "hero_image_url",
             "listing_type",
             "property_type",
         ]
