@@ -1,7 +1,7 @@
 from rest_framework import viewsets, filters, permissions, mixins
 from rest_framework.exceptions import PermissionDenied
 from django_filters.rest_framework import DjangoFilterBackend
-from .models import Listing
+from .models import Listing, ListingImage
 from .serializers import ListingListSerializer, ListingDetailSerializer, ListingWriteSerializer, ListingImageSerializer
 from .permissions import IsLeaseManagerOrReadOnly
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -70,9 +70,28 @@ class ListingViewSet(viewsets.ModelViewSet):
             "property_types": Listing._meta.get_field("property_type").choices,
         })
 
-class ListingImageViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin):
+class ListingImageViewSet(
+    viewsets.GenericViewSet,
+    mixins.CreateModelMixin,
+    mixins.DestroyModelMixin,
+    mixins.UpdateModelMixin,
+):
     serializer_class = ListingImageSerializer
     permission_classes = [permissions.IsAuthenticated]
+    http_method_names = ["post", "patch", "delete"]
+
+    def get_queryset(self):
+        return ListingImage.objects.filter(
+            listing_id=self.kwargs["listing_pk"],
+            listing__landlord__user=self.request.user
+        )
 
     def perform_create(self, serializer):
         serializer.save(listing_id=self.kwargs["listing_pk"])
+
+    #NOTE: TODO: add cloudinary public id to model instead.  
+    def perform_destroy(self, instance): 
+        # e.g. ".../rentapart/abc123.jpg" → "rentapart/abc123"
+        public_id = "/".join(instance.image_url.split("/")[-2:]).rsplit(".", 1)[0]
+        cloudinary.uploader.destroy(public_id)
+        instance.delete()
