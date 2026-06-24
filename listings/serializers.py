@@ -28,7 +28,8 @@ class ListingListSerializer(serializers.ModelSerializer):
             "bedrooms",
             "rating",
             "lat",
-            "lng"
+            "lng",
+            "is_unfinished"
         ]
 
     def perform_create(self, serializer):

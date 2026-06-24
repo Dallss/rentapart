@@ -50,6 +50,10 @@ class ListingViewSet(viewsets.ModelViewSet):
         ):
             qs = qs.filter(is_available=True)
 
+        mine_false = self.request.query_params.get("mine") == "false"
+        if mine_false and user.is_authenticated:
+            qs = qs.exclude(landlord=user.profile)
+
         return qs
 
 
@@ -69,6 +73,19 @@ class ListingViewSet(viewsets.ModelViewSet):
             "listing_types": Listing._meta.get_field("listing_type").choices,
             "property_types": Listing._meta.get_field("property_type").choices,
         })
+
+    @action(detail=True, methods=["post", "delete"], permission_classes=[IsAuthenticated])
+    def like(self, request, pk=None):
+        listing = self.get_object()
+        profile = request.user.profile
+
+        if request.method == "POST":
+            profile.liked_listings.add(listing)
+            return Response({"liked": True})
+
+        profile.liked_listings.remove(listing)
+        return Response({"liked": False})
+
 
 class ListingImageViewSet(
     viewsets.GenericViewSet,
