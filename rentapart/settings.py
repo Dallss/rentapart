@@ -153,6 +153,13 @@ CORS_ALLOWED_ORIGINS = [
     for origin in os.environ.get("ALLOWED_ORIGINS", "").split(",")
     if origin.strip()
 ]
+
+CORS_ALLOWED_ORIGIN_REGEXES = [
+    regex.strip()
+    for regex in os.environ.get("ALLOWED_ORIGIN_REGEXES", "").split(",")
+    if regex.strip()
+]
+
 CORS_ALLOW_CREDENTIALS = True
 
 LANGUAGE_CODE = "en-us"
